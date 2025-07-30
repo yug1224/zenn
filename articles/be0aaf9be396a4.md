@@ -11,7 +11,7 @@ publication_name: 'dress_code'
 
 こんにちは。ぷーじ（[@yug1224](https://x.com/yug1224)）です。
 
-最近、[Dress Code株式会社](https://www.dress-code.com/ja)に転職し、5年ぶりにEMからICへ戻ったので、その決断の背景と現在の状況を共有します！
+最近、[Dress Code株式会社](https://www.dress-code.com/ja)に転職し、5年ぶりにEM（Engineering Manager）からIC（Individual Contributor）、つまり1人のプロダクトエンジニアに戻ったので、その決断の背景と現在の状況を共有します！
 
 ちなみに転職活動の話はこちらのPodcastでもしているので、良かったら聞いてみてください！
 

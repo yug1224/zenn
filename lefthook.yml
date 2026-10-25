@@ -1,0 +1,6 @@
+pre-commit:
+  jobs:
+    - name: oxfmt
+      glob: '*.{md,ts,json,yml}'
+      run: pnpm exec oxfmt {staged_files}
+      stage_fixed: true

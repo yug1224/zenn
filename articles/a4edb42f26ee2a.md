@@ -1,11 +1,11 @@
 ---
-title: "EMからICへ、キャリアは螺旋階段のように上がっていける"
-emoji: "🔄"
-type: "idea"
-topics: ["キャリア", "転職", "AI", "EM"]
+title: 'EMからICへ、キャリアは螺旋階段のように上がっていける'
+emoji: '🔄'
+type: 'idea'
+topics: ['キャリア', '転職', 'AI', 'EM']
 published: true
-publication_name: "dress_code"
-published_at: "2026-05-14 00:00"
+publication_name: 'dress_code'
+published_at: '2026-05-14 00:00'
 ---
 
 ![EMからICへ、キャリアは螺旋階段のように上がっていける](/images/a4edb42f26ee2a/Gemini_Generated_Image_f47n03f47n03f47n.png)

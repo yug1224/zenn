@@ -10,5 +10,7 @@
     "esac",
     "githubactions",
     "hrbrain"
-  ]
+  ],
+  "editor.defaultFormatter": "oxc.oxc-vscode",
+  "editor.formatOnSave": true
 }

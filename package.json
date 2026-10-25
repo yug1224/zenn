@@ -1,18 +1,20 @@
 {
   "name": "zenn",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
+  "private": true,
   "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "prepare": "lefthook install",
+    "preview": "zenn preview",
+    "new:article": "zenn new:article",
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check"
+  },
   "dependencies": {
-    "zenn-cli": "^0.5.2"
+    "zenn-cli": "^0.5.8"
   },
   "devDependencies": {
-    "prettier": "^3.0.2"
+    "oxfmt": "^0.74.0"
   }
 }

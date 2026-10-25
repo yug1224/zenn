@@ -1,5 +1,5 @@
 ---
-title: 'Schema-Driven UI を Zod の契約で守り、BE と UI の契約のずれをテストで検知する'
+title: 'Zod の契約で BE と UI のずれをテストし、振る舞いまで守る Schema-Driven UI'
 emoji: '📜'
 type: 'tech' # tech: 技術記事 / idea: アイデア
 topics: ['zod', 'typescript', 'frontend', 'designsystem', 'test']

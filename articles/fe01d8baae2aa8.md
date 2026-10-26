@@ -3,7 +3,7 @@ title: 'Zod の契約で BE と UI のずれをテストし、振る舞いまで
 emoji: '📜'
 type: 'tech' # tech: 技術記事 / idea: アイデア
 topics: ['zod', 'typescript', 'frontend', 'designsystem', 'test']
-published: false
+published: true
 publication_name: 'dress_code'
 ---
 

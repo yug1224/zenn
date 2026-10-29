@@ -19,6 +19,10 @@ https://vuefes.jp/2026/speaker/yug1224
 
 @[speakerdeck](9de83bc11e6c4f948216301186bd6e97)
 
+当日のブースや登壇の様子は Dress Code の note にまとまっているので、あわせてご覧ください。
+
+https://note.com/dresscode/n/n3ac7b5bb4ab0
+
 Dress Code ではデザインシステムの dresscode-ui を Schema-Driven UI（SDUI）として作っています。画面の仕様は Zod で書いた契約で決まり、バックエンド（dresscode-backend）の API も Zod の契約で定義しています。
 
 フロントエンド（dresscode-frontend）は、この 2 つの契約を受け取って画面を作ります。たとえば AI チャットの画面では、dresscode-backend から受け取った会話を dresscode-ui の契約に合う形に写し、dresscode-ui の部品で描画しています。

@@ -54,7 +54,7 @@ dresscode-ui には、専任のデザインシステムチームがいません�
 
 dresscode-ui では使えるものをあえて制限しています。AI が作っても人が作っても、画面を増やしていくと見た目や振る舞いは少しずつずれていきます。制限をかけるのは、このずれを抑えて、誰が作っても同じ UI になるようにするためです。
 
-この考え方は AI にデザインを任せるときの品質の守り方として広まっている「デザインハーネス」や「Agentic Design System」と同じです。デザインハーネスは制約・文脈・検証・評価の 4 層で AI の生成を導く考え方です。
+この考え方は、AI にデザインを任せるときの品質の守り方として広まっている「デザインハーネス」や「Agentic Design System」と重なります。デザインハーネスは、制約・コンテキスト・検証・フィードバックの 4 層で AI の生成を導く仕組みです。デザインシステムだけでなく、設計知識や検証、開発のワークフローまでを対象にしていて、デザインシステムはその中核に位置づけられています。
 
 https://note.com/kgsi/n/n707d989e1a44
 
@@ -62,7 +62,7 @@ Agentic Design System は、AI エージェントが読むだけでなく、必�
 
 https://www.supernova.io/blog/what-is-an-agentic-design-system
 
-私たちの理解では、この 2 つが主に扱うのは見た目とコンポーネントの使い方です。デザインハーネスは状態の抜けも検証の対象にしますが、操作したときに何が起きるかは人の判断に残しています。Agentic Design System も、コンポーネントの状態の一覧までは扱うものの、操作の結果を定める部分は扱っていません。
+2 つの違いはスコープにあります。Agentic Design System はデザインシステムそのものを、デザインハーネスはデザインシステムを含めた開発の流れ全体を扱います。
 
 dresscode-ui では制限を 2 つの層でかけています。
 
@@ -73,7 +73,7 @@ dresscode-ui では制限を 2 つの層でかけています。
 
 VRT はビジュアルリグレッションテスト（画面のスクリーンショットの差分を見るテスト）です。
 
-見た目の層はデザインハーネスの守備範囲とほぼ重なります。振る舞いの層まで契約で決めているのが dresscode-ui の特徴で、この記事で扱う Zod の契約はこちらの層の話です。
+見た目の層は、デザインハーネスの検証で例に挙がっているトークン準拠やアクセシビリティのチェックと近い内容です。dresscode-ui では、そこに振る舞いの層を加えて契約で決め、テストで確かめています。デザインハーネスの 4 層でいえば、検証の層を振る舞いにも向けたものです。この記事で扱う Zod の契約はこちらの層の話です。
 
 ## dresscode-ui の契約で制限していること
 
@@ -254,7 +254,7 @@ oRPC にはレスポンスを検証するプラグインがありますが、違
 
 ## 参考文献
 
-- [What is Design Harness｜こぎそ](https://note.com/kgsi/n/n707d989e1a44)
+- [デザインハーネスとは何か｜こぎそ](https://note.com/kgsi/n/n707d989e1a44)
 - [AIエージェントのUI品質を守る4層の運用基盤 - Design Harness](https://zenn.dev/suwash/articles/design-harness_20260805)
 - [デザインハーネス入門｜デザペディア](https://www.ds-pedia.com/2026/06/29/design-harness/)
 - [What Is an Agentic Design System? A Practical Definition｜Supernova](https://www.supernova.io/blog/what-is-an-agentic-design-system)

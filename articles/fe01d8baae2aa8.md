@@ -13,7 +13,7 @@ publication_name: 'dress_code'
 
 こんにちは。ぷーじ（[@yug1224](https://x.com/yug1224)）です。
 
-2026 年 10 月 24 日の Vue Fes Japan 2026 で、「契約で守るコンパウンドプロダクトのデザインシステム」というタイトルで登壇しました。この記事は、その発表の内容がもとになっています。
+2026 年 10 月 24 日の Vue Fes Japan 2026 で、「契約で守るコンパウンドプロダクトのデザインシステム」というタイトルで登壇しました。この記事はその発表の内容がもとになっています。
 
 https://vuefes.jp/2026/speaker/yug1224
 
@@ -25,7 +25,7 @@ https://note.com/dresscode/n/n3ac7b5bb4ab0
 
 Dress Code ではデザインシステムの dresscode-ui を Schema-Driven UI（SDUI）として作っています。画面の仕様は Zod で書いた契約で決まり、バックエンド（dresscode-backend）の API も Zod の契約で定義しています。
 
-フロントエンド（dresscode-frontend）は、この 2 つの契約を受け取って画面を作ります。たとえば AI チャットの画面では、dresscode-backend から受け取った会話を dresscode-ui の契約に合う形に写し、dresscode-ui の部品で描画しています。
+フロントエンド（dresscode-frontend）はこの 2 つの契約を受け取って画面を作ります。たとえば AI チャットの画面では dresscode-backend から受け取った会話を dresscode-ui の契約に合う形に写し、dresscode-ui の部品で描画しています。
 
 登壇では dresscode-ui の契約を中心に話しました。この記事では、dresscode-ui と dresscode-backend が Zod で契約をどう書いているかと、dresscode-frontend が 2 つの契約を受け取るときに、ずれをテストで検知する方法を紹介します。
 
@@ -35,7 +35,7 @@ Dress Code ではデザインシステムの dresscode-ui を Schema-Driven UI�
 
 SDUI は、一般には Server-Driven UI の略として使われることが多い言葉です。サーバーが画面の定義を JSON で返し、クライアントがそれを描画する方式を指します。
 
-私たちのチームでは SDUI を Schema-Driven UI と読んでいます。画面の定義がどこから来るかを並べると、サーバーは入口の 1 つにすぎないからです。
+私たちのチームでは SDUI を Schema-Driven UI と読んでいます。画面の定義がどこから届くかを並べると、サーバーは出どころの 1 つにすぎないからです。
 
 ```mermaid
 flowchart TB
@@ -46,21 +46,29 @@ flowchart TB
   C -->|"適合したものだけ"| F["同じ品質の画面"]
 ```
 
-どの入口から来た定義でも、同じ契約に適合していれば同じ画面が出ます。私たちはこの性質を author-agnostic（作者に依存しない）と呼んでいます。Server-Driven は配信経路の名前で、Schema-Driven は契約の名前です。React のコンポーネントは契約を描画する手段の 1 つで、私たちがバージョンを管理してテストする本体は契約のほうです。
+どこから届いた定義でも、同じ契約に適合していれば同じ画面が出ます。私たちはこの性質を author-agnostic（作者に依存しない）と呼んでいます。Server-Driven は配信経路の名前で、Schema-Driven は契約の名前です。React のコンポーネントは契約を描画する手段の 1 つで、私たちがバージョンを管理してテストする本体は契約のほうです。
 
 ## dresscode-ui を誰がどう作っているか
 
-dresscode-ui には、専任のデザインシステムチームがいません。プロダクト開発の中で、PdM と PdE（プロダクトエンジニア）が開発から運用・保守までを受け持っています。
+dresscode-ui には専任のデザインシステムチームがいません。プロダクト開発の中で、PdM と PdE（プロダクトエンジニア）が開発から運用・保守までを受け持っています。
 
 dresscode-ui では使えるものをあえて制限しています。AI が作っても人が作っても、画面を増やしていくと見た目や振る舞いは少しずつずれていきます。制限をかけるのは、このずれを抑えて、誰が作っても同じ UI になるようにするためです。
 
-この考え方は、AI にデザインを任せるときの品質の守り方として広まっている「デザインハーネス」や「Agentic Design System」と重なります。デザインハーネスは、制約・コンテキスト・検証・フィードバックの 4 層で AI の生成を導く仕組みです。デザインシステムだけでなく、設計知識や検証、開発のワークフローまでを対象にしていて、デザインシステムはその中核に位置づけられています。
+この考え方は AI にデザインを任せるときの品質の守り方として広まっている「デザインハーネス」や「Agentic Design System」と重なります。デザインハーネスは制約・コンテキスト・検証・フィードバックの 4 層で AI の生成を導く仕組みです。デザインシステムだけでなく、設計知識や検証、開発のワークフローまでを対象にしていて、デザインシステムはその中核に位置づけられています。
 
 https://note.com/kgsi/n/n707d989e1a44
+
+https://zenn.dev/suwash/articles/design-harness_20260805
+
+https://www.ds-pedia.com/2026/06/29/design-harness/
 
 Agentic Design System は、AI エージェントが読むだけでなく、必要な情報を問い合わせて使えるように作ったデザインシステムを指します。
 
 https://www.supernova.io/blog/what-is-an-agentic-design-system
+
+https://www.intodesignsystems.com/agentic-design-systems
+
+https://designproject.io/blog/agentic-design-system/
 
 2 つの違いはスコープにあります。Agentic Design System はデザインシステムそのものを、デザインハーネスはデザインシステムを含めた開発の流れ全体を扱います。
 
@@ -73,7 +81,7 @@ dresscode-ui では制限を 2 つの層でかけています。
 
 VRT はビジュアルリグレッションテスト（画面のスクリーンショットの差分を見るテスト）です。
 
-見た目の層は、デザインハーネスの検証で例に挙がっているトークン準拠やアクセシビリティのチェックと近い内容です。dresscode-ui では、そこに振る舞いの層を加えて契約で決め、テストで確かめています。デザインハーネスの 4 層でいえば、検証の層を振る舞いにも向けたものです。この記事で扱う Zod の契約はこちらの層の話です。
+見た目の層は、デザインハーネスの検証で例に挙がっているトークン準拠やアクセシビリティのチェックと近い内容です。dresscode-ui ではそこに振る舞いの層を加えて契約で決め、テストで確かめています。デザインハーネスの 4 層でいえば、検証の層を振る舞いにも向けたものです。この記事で扱う Zod の契約はこちらの層の話です。
 
 ## dresscode-ui の契約で制限していること
 
@@ -94,7 +102,7 @@ export const actionResult = z.discriminatedUnion('status', [
 ]);
 ```
 
-`kind` は、決まった値の一覧に加えて、未知の文字列も受け付ける形です。BE 側で値が増えても parse は落ちず、UI は未知の値を決まった種類として扱います。UI が `message` の文字列で分岐しないことも決まりです。失敗（`{ kind, retryable, message }`）や、問いへの答え（`accept` / `decline` / `cancel` の 3 つ）も同じ考え方で契約にしています。
+`kind` は決まった値の一覧に加えて、未知の文字列も受け付ける形です。BE 側で値が増えても parse は落ちず、UI は未知の値を決まった種類として扱います。UI が `message` の文字列で分岐しないことも決まりです。失敗（`{ kind, retryable, message }`）や、問いへの答え（`accept` / `decline` / `cancel` の 3 つ）も同じ考え方で契約にしています。
 
 会話の中に知らない種類の画面が届いたときも、会話全体の parse は落とさず、代わりの表示で描くと決めています。
 
@@ -177,7 +185,7 @@ expect(chatSession.safeParse(session).success).toBe(true);
 
 ### After
 
-入力を BE の契約で parse してから使い、出力を ui の契約で検証するようにしました。パッケージ名と一部の型名は、仮のものに置き換えています。
+入力を BE の契約で parse してから使い、出力を ui の契約で検証するようにしました。パッケージ名と一部の型名は仮のものに置き換えています。
 
 ```ts
 import { SessionDetailSchema } from 'backend-contract';
@@ -185,7 +193,7 @@ import { chatSession } from 'ui-contract';
 
 const beMessageSchema = SessionDetailSchema.shape.messages.element;
 
-/** BE の契約に合わない発言は、入力に使う前に落とす */
+/** BE の契約に合わない発言なら、入力に使う前にテストを失敗させる */
 const validMessage = (message: ChatMessage): ChatMessage => {
   beMessageSchema.parse(message);
   return message;
@@ -202,7 +210,7 @@ const question = validMessage({
 expect(chatSession.safeParse(session).error).toBeUndefined();
 ```
 
-`validMessage` は、parse の戻り値ではなく元の値を返します。FE の `ChatMessage` 型は契約にない項目も持っていて、parse の戻り値を使うとその型が崩れるためです。
+`validMessage` は parse の戻り値ではなく元の値を返します。FE の `ChatMessage` 型は契約にない項目も持っていて、parse の戻り値を使うとその型が崩れるためです。
 
 出力の検証は `.success` を `true` と比べる書き方から、`.error` が `undefined` かを見る書き方に変えました。テストが落ちたとき、どの項目が契約に合わないかがテストの結果に出ます。
 
@@ -238,27 +246,16 @@ it.each<[string, Partial<ChatMessage>]>([
 
 稼働中の BE が先に変わった場合は、FE がバージョンを上げるまで気付けません。これを実行時に検知するには、レスポンスを検証する必要があります。
 
-oRPC にはレスポンスを検証するプラグインがありますが、違反すると例外を投げるので、画面が止まります。記録だけにするなら、`safeParse` してログに送る処理と、ログを見張る監視の設定まで要ります。今のところは手間に見合わないと判断して、実行時の検証は見送りました。
+oRPC にはレスポンスを検証するプラグインがありますが、違反すると例外を投げるので、画面が止まります。記録だけにするなら、`safeParse` してログに送る処理と、ログを監視する設定まで要ります。今のところは手間に見合わないと判断して、実行時の検証は見送りました。
 
 この判断と、変換関数のテストの書き方はリポジトリのドキュメントに残しました。BE の API を呼ぶ作業で AI エージェントが読むスキルからも参照させて、バージョンを上げる作業の途中で気付けるようにしています。
 
 ## おわりに
 
-私たちのチームでは dresscode-ui の本体を Zod の契約と考え、見た目だけでなく振る舞いまで契約で制限しています。契約が 2 つあるなら、ずれが起きるのは 2 つが合流する場所です。その場所を両側の Zod でテストに挟むと、バージョンを上げる PR でずれが落ちるようになりました。
+私たちのチームでは dresscode-ui の本体を Zod の契約と考え、見た目だけでなく振る舞いまで契約で制限しています。契約が 2 つあるなら、ずれが起きるのは 2 つが合流する場所です。その場所を両側の Zod でテストに挟むと、ずれがあればバージョンを上げる PR でテストが落ちるようになりました。
 
 一方で、全部を検知しようとはしていません。稼働中の BE が先に変わる場合と、契約にない項目の変更は、検知しないと決めて表に残しました。
 
 ほかの画面で変換関数を書くときも、同じテストを置く予定です。
 
 最後まで読んでいただき、ありがとうございました。
-
-## 参考文献
-
-- [デザインハーネスとは何か｜こぎそ](https://note.com/kgsi/n/n707d989e1a44)
-- [AIエージェントのUI品質を守る4層の運用基盤 - Design Harness](https://zenn.dev/suwash/articles/design-harness_20260805)
-- [デザインハーネス入門｜デザペディア](https://www.ds-pedia.com/2026/06/29/design-harness/)
-- [What Is an Agentic Design System? A Practical Definition｜Supernova](https://www.supernova.io/blog/what-is-an-agentic-design-system)
-- [Agentic Design Systems: The Complete Guide｜Into Design Systems](https://www.intodesignsystems.com/agentic-design-systems)
-- [Agentic design system: how to build a component library AI agents can actually use｜TDP](https://designproject.io/blog/agentic-design-system/)
-- [JSON Schema｜Zod](https://zod.dev/json-schema)
-- [oRPC](https://orpc.unnoq.com/)

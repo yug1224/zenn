@@ -35,7 +35,7 @@ Dress Code ではデザインシステムの dresscode-ui を Schema-Driven UI�
 
 SDUI は、一般には Server-Driven UI の略として使われることが多い言葉です。サーバーが画面の定義を JSON で返し、クライアントがそれを描画する方式を指します。
 
-私たちのチームでは SDUI を Schema-Driven UI と読んでいます。画面の定義がどこから届くかを並べると、サーバーはその 1 つにすぎないからです。
+私たちのチームでは SDUI を Schema-Driven UI と読んでいます。画面の定義がどこから届くかを並べると、サーバーは出どころの 1 つにすぎないからです。
 
 ```mermaid
 flowchart TB
@@ -193,7 +193,7 @@ import { chatSession } from 'ui-contract';
 
 const beMessageSchema = SessionDetailSchema.shape.messages.element;
 
-/** BE の契約に合わない発言は、入力に使う前に落とす */
+/** BE の契約に合わない発言なら、入力に使う前にテストを失敗させる */
 const validMessage = (message: ChatMessage): ChatMessage => {
   beMessageSchema.parse(message);
   return message;

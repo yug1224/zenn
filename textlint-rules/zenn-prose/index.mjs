@@ -270,13 +270,14 @@ function firstNonWhitespaceIndex(text, offset) {
 function findHeadingStructureErrors(headings) {
   const errors = [];
 
-  for (let i = 1; i < headings.length; i++) {
-    const prev = headings[i - 1];
+  for (let i = 0; i < headings.length; i++) {
+    // 最初の見出しは記事タイトル（H1）の次として比べる
+    const prevDepth = headings[i - 1]?.depth ?? 1;
     const current = headings[i];
-    if (current.depth - prev.depth >= 2) {
+    if (current.depth - prevDepth >= 2) {
       errors.push({
         node: current.node,
-        message: `H${prev.depth} の次に H${current.depth} があり、見出しの段が飛んでいます。H${prev.depth + 1} にしてください。`,
+        message: `H${prevDepth} の次に H${current.depth} があり、見出しの段が飛んでいます。H${prevDepth + 1} にしてください。`,
       });
     }
   }

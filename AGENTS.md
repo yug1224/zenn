@@ -73,4 +73,4 @@ publication_name: 'dress_code'
 ## 整形
 
 - 設定は `oxfmt.config.ts`。front matter とコードブロックも整形する
-- コミット時に lefthook がステージ済みファイルを `oxfmt` で整形し、ステージ済みの `articles/*.md` に `textlint` を実行する。CI は `pnpm fmt:check`・`pnpm test:prose-rules`・`pnpm lint:prose` を実行する
+- コミット時に lefthook がステージ済みファイルを `oxfmt` で整形し、ステージ済みの `articles/*.md` に `textlint --fix` を実行する（直せる表記揺れは直して stage し、直せない違反が残れば commit を止める）。CI は `pnpm fmt:check`・`pnpm test:prose-rules`・`pnpm lint:prose` を実行する

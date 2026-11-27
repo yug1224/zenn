@@ -58,6 +58,17 @@ test('直前の見出しより 2 段以上深い見出しを検出し、1 段深
   assert.match(messages[0].message, /H2 の次に H4/);
 });
 
+test('記事の最初の見出しが H3 以下なら、H1 からの段の飛びとして検出する', async () => {
+  const md = ['### 最初が H3', '## A', '## B'].join('\n');
+
+  const messages = (await lintZennProse(md)).filter((m) => /段/.test(m.message));
+  assert.deepEqual(
+    messages.map((m) => m.line),
+    [1],
+  );
+  assert.match(messages[0].message, /H1 の次に H3/);
+});
+
 test('同じ親の下に 1 つしかない H2〜H4 を検出し、2 つ以上並ぶ見出しとコードブロック・引用内は許可する', async () => {
   const md = [
     '## 唯一の H2',

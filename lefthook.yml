@@ -6,4 +6,6 @@ pre-commit:
       stage_fixed: true
     - name: textlint
       glob: 'articles/*.md'
-      run: pnpm exec textlint {staged_files}
+      # --fix は直せない違反しか残らないと exit 0 になるので、直したあとに検査し直す
+      run: pnpm exec textlint --fix {staged_files} && pnpm exec textlint {staged_files}
+      stage_fixed: true

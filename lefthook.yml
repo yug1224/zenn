@@ -1,6 +1,11 @@
 pre-commit:
   jobs:
     - name: oxfmt
-      glob: '*.{md,ts,json,yml}'
+      glob: '*.{md,ts,mjs,json,yml}'
       run: pnpm exec oxfmt {staged_files}
       stage_fixed: true
+    # 既存記事は違反を抱えているので、新規追加の記事だけを検査する
+    - name: textlint
+      glob: 'articles/*.md'
+      files: git diff --cached --name-only --diff-filter=A
+      run: pnpm exec textlint {files}

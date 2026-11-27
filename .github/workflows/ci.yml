@@ -16,3 +16,18 @@ jobs:
       - uses: jdx/mise-action@82a612c5ab8bcda7cc5db6b7e81a8e7584c3dc6e # v5.2.3
       - run: pnpm install --frozen-lockfile
       - run: pnpm fmt:check
+
+  prose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: jdx/mise-action@82a612c5ab8bcda7cc5db6b7e81a8e7584c3dc6e # v5.2.3
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test:prose-rules
+      # 既存記事は違反を抱えているので、lefthook と同じく PR で追加した記事だけを検査する
+      - if: github.event_name == 'pull_request'
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: git diff -z --name-only --diff-filter=A "origin/$BASE_REF...HEAD" -- 'articles/*.md' | xargs -0 -r pnpm exec textlint

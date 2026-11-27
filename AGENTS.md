@@ -66,11 +66,11 @@ publication_name: 'dress_code'
 ### 公開前チェック
 
 1. `pnpm fmt:check` で整形差分がないことを確認する
-2. `pnpm lint:prose` で表記揺れ・日本語校正・長段落・文末連続・H4 見出しがないことを確認する（表記揺れは `pnpm lint:prose:fix` で自動修正できる）
+2. `pnpm exec textlint articles/<slug>.md` で表記揺れ・日本語校正・長段落・文末連続・H4 見出しがないことを確認する（表記揺れは `pnpm lint:prose:fix` で自動修正できる）
 3. `yomiyasu` で推敲し、意味が変わっていないことと WARN 残件を確認する
 4. `pnpm preview` でブラウザ表示（太字・Mermaid 図・表・見出しアンカー・画像）を確認する
 
 ## 整形
 
 - 設定は `oxfmt.config.ts`。front matter とコードブロックも整形する
-- コミット時に lefthook がステージ済みファイルを `oxfmt` で整形し、新規追加した `articles/*.md` に `textlint` を実行する（既存記事は `pnpm lint:prose` で確認する）。CI は `pnpm fmt:check` で確認する
+- コミット時に lefthook がステージ済みファイルを `oxfmt` で整形し、新規追加した `articles/*.md` に `textlint` を実行する（既存記事は `pnpm lint:prose` で確認する）。CI は `pnpm fmt:check` と `pnpm test:prose-rules` を実行し、PR で追加した `articles/*.md` に `textlint` を実行する

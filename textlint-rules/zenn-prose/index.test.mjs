@@ -14,26 +14,92 @@ async function lintZennProse(markdown) {
   return result.messages.filter((m) => m.ruleId === 'zenn-prose');
 }
 
-test('H4 以下の見出しを検出し H2/H3 やコードブロック内は許可する', async () => {
+test('H5 以下の見出しを検出し H2〜H4 やコードブロック内は許可する', async () => {
   const md = [
     '## H2 見出し',
-    '',
     '### H3 見出し',
-    '',
     '#### H4 見出し',
-    '',
     '##### H5 見出し',
+    '###### H6 見出し',
+    '#### H4 見出し',
+    '### H3 見出し',
+    '## H2 見出し',
     '',
     '```md',
-    '#### コードブロック内',
+    '##### コードブロック内',
     '```',
   ].join('\n');
 
   const messages = await lintZennProse(md);
-  assert.equal(messages.length, 2);
   assert.deepEqual(
     messages.map((m) => m.line),
-    [5, 7],
+    [4, 5],
+  );
+});
+
+test('直前の見出しより 2 段以上深い見出しを検出し、1 段深い見出しと浅く戻る見出しは許可する', async () => {
+  const md = [
+    '## A',
+    '#### 飛び',
+    '#### 飛び',
+    '## B',
+    '### B-1',
+    '#### B-1-a',
+    '#### B-1-b',
+    '### B-2',
+    '## C',
+  ].join('\n');
+
+  const messages = (await lintZennProse(md)).filter((m) => /段/.test(m.message));
+  assert.deepEqual(
+    messages.map((m) => m.line),
+    [2],
+  );
+  assert.match(messages[0].message, /H2 の次に H4/);
+});
+
+test('同じ親の下に 1 つしかない H2〜H4 を検出し、2 つ以上並ぶ見出しとコードブロック・引用内は許可する', async () => {
+  const md = [
+    '## 唯一の H2',
+    '### 単独の H3',
+    '#### H4-a',
+    '#### H4-b',
+    '',
+    '```md',
+    '## コードブロック内',
+    '```',
+    '',
+    '> ## 引用内',
+  ].join('\n');
+
+  const messages = await lintZennProse(md);
+  assert.deepEqual(
+    messages.map((m) => m.line),
+    [1, 2],
+  );
+  assert.match(messages[0].message, /記事の H2 が 1 つだけ/);
+  assert.match(messages[1].message, /H2「唯一の H2」の下の H3 が 1 つだけ/);
+});
+
+test('H4 が 1 つだけでも、別の H3 の下にあれば親ごとに数える', async () => {
+  const md = ['## A', '### A-1', '#### 単独', '### A-2', '#### H4-a', '#### H4-b', '## B'].join(
+    '\n',
+  );
+
+  const messages = await lintZennProse(md);
+  assert.deepEqual(
+    messages.map((m) => m.line),
+    [3],
+  );
+});
+
+test('リンクテキストの全角コロンは許可し、リンク外の全角コロンは検出する', async () => {
+  const md = '[設計：方針](https://example.com) を読みました：感想です。';
+
+  const messages = await lintZennProse(md);
+  assert.deepEqual(
+    messages.map((m) => m.column),
+    [36],
   );
 });
 
@@ -142,6 +208,23 @@ test('同一文末の 3 連続を検出し 2 連続・異種文末・括弧内�
   assert.match(messages[messages.length - 1].message, /文末「ます」/);
 });
 
+test('Zenn コンテナの区切り行をまたぐ文末は連続として数えない', async () => {
+  const md = [':::message', 'A です。', 'B です。', ':::', 'C です。'].join('\n');
+  assert.equal((await lintZennProse(md)).length, 0);
+});
+
+test('details のタイトルは本文の文末連続に数えない', async () => {
+  const md = [':::details 補足です。', 'A です。', 'B です。', ':::'].join('\n');
+  assert.equal((await lintZennProse(md)).length, 0);
+});
+
+test('閉じの区切り行の直後に続く本文は文末連続に数える', async () => {
+  const md = [':::message', 'A です。', ':::', 'B です。', 'C です。', 'D です。'].join('\n');
+  const messages = await lintZennProse(md);
+  assert.equal(messages.length, 1);
+  assert.equal(messages[0].line, 6);
+});
+
 test('半角 !・脚注・句点なしの最終文・文末絵文字でも文末連続を検出し、絵文字は 1 字で数える', async () => {
   const md = [
     'これは文です! これも文です! それも文です!',
@@ -223,6 +306,8 @@ test('全角コロンと定型クロージングを検出しコード・引用�
     '🦀 絵文字の後：テストです。',
     '',
     '詳細は（https://example.com）を確認：参考になれば幸いです。',
+    '',
+    '## 別の見出し',
   ].join('\n');
 
   const messages = await lintZennProse(md);
@@ -283,5 +368,42 @@ test('Zenn 独自記法で誤検知せず prh.yml の自動修正が機能する
     longMessageResult.messages.filter((m) => m.ruleId === 'ja-technical-writing/sentence-length')
       .length,
     1,
+  );
+});
+
+test('.textlintrc.json で並立助詞・記号連続・口語文末を許可し、それ以外の違反は検出する', async () => {
+  const allowedMd = [
+    'フロントエンドもバックエンドも担当します。',
+    '',
+    'これは A か B かを選びます。',
+    '',
+    'そうなんですね……。すごい！！',
+    '',
+    'とても助かりましたｗ',
+    '',
+    '使っているのですが……',
+    '',
+    '導入あるあるを語ります。',
+  ].join('\n');
+
+  const allowedResult = await linter.lintText(allowedMd, 'test.md');
+  assert.equal(allowedResult.messages.length, 0);
+
+  const disallowedMd = [
+    '画面にデータに設定します。',
+    '',
+    '私はは行きます。',
+    '',
+    '句点が抜けている文',
+  ].join('\n');
+
+  const disallowedResult = await linter.lintText(disallowedMd, 'test.md');
+  assert.deepEqual(
+    disallowedResult.messages.map((m) => [m.line, m.ruleId]),
+    [
+      [1, 'ja-technical-writing/no-doubled-joshi'],
+      [3, 'ja-technical-writing/ja-no-successive-word'],
+      [5, 'ja-technical-writing/ja-no-mixed-period'],
+    ],
   );
 });

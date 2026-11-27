@@ -23,6 +23,16 @@
       },
       "no-exclamation-question-mark": false,
       "ja-no-weak-phrase": false,
+      "no-doubled-joshi": {
+        "allow": ["も", "か"]
+      },
+      "ja-no-successive-word": {
+        "allowSymbol": true,
+        "allow": ["ある"]
+      },
+      "ja-no-mixed-period": {
+        "allowPeriodMarks": ["ｗ", "…"]
+      },
       "max-kanji-continuous-len": {
         "max": 6,
         "allow": []

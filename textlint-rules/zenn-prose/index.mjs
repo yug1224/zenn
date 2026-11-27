@@ -7,8 +7,7 @@ const SENTENCE_ENDINGS = ['ませんでした', 'ました', 'でした', 'ま�
 const CLOSING_CLICHE_RE = /参考になれば[*_\s]*(?:幸い|嬉しい|うれしい)[*_\s]*です/g;
 const FULLWIDTH_COLON_RE = /：/g;
 const ZENN_CONTAINER_LINE_RE = /^:::.*$/gm;
-// :::details のタイトルは本文として検査するため、記法部分だけを伏せる
-const ZENN_CONTAINER_MARKER_RE = /^:{3,}(?:message(?:[ \t]+alert)?|details)?/gm;
+const ZENN_CONTAINER_KEYWORD_RE = /^:{3,}(?:message(?:[ \t]+alert)?|details)?/gm;
 const ZENN_EMBED_LINE_RE = /^@\[[a-z0-9_-]+\]\([^\n]+\)[ \t]*$/gm;
 const BARE_URL_RE = /https?:\/\/[A-Za-z0-9\-._~:/?#[\]@!$&'()*+,;=%]+/g;
 
@@ -118,7 +117,7 @@ function buildMaskedProse(node, raw) {
   const chars = raw.split('');
   const baseStart = node.range[0];
 
-  maskPattern(chars, raw, ZENN_CONTAINER_MARKER_RE);
+  maskPattern(chars, raw, ZENN_CONTAINER_KEYWORD_RE);
   maskPattern(chars, raw, ZENN_EMBED_LINE_RE);
 
   walkChildren(node, (child) => {
@@ -268,13 +267,69 @@ function firstNonWhitespaceIndex(text, offset) {
   return match ? offset + match.index : offset;
 }
 
+function findHeadingStructureErrors(headings) {
+  const errors = [];
+
+  for (let i = 1; i < headings.length; i++) {
+    const prev = headings[i - 1];
+    const current = headings[i];
+    if (current.depth - prev.depth >= 2) {
+      errors.push({
+        node: current.node,
+        message: `H${prev.depth} の次に H${current.depth} があり、見出しの段が飛んでいます。H${prev.depth + 1} にしてください。`,
+      });
+    }
+  }
+
+  const childrenByParent = new Map();
+  const ancestors = [];
+  for (const heading of headings) {
+    while (ancestors.length > 0 && ancestors[ancestors.length - 1].depth >= heading.depth) {
+      ancestors.pop();
+    }
+    const parent = ancestors[ancestors.length - 1] ?? null;
+    if (heading.depth <= 4 && heading.depth === (parent?.depth ?? 1) + 1) {
+      if (!childrenByParent.has(parent)) childrenByParent.set(parent, []);
+      childrenByParent.get(parent).push(heading);
+    }
+    ancestors.push(heading);
+  }
+
+  for (const [parent, children] of childrenByParent) {
+    if (children.length !== 1) continue;
+    const [child] = children;
+    const owner = parent ? `H${parent.depth}「${parent.text}」の下` : '記事';
+    errors.push({
+      node: child.node,
+      message: `${owner}の H${child.depth} が 1 つだけです。見出しを外して本文に続けるか、同じ段の見出しを増やしてください。`,
+    });
+  }
+
+  return errors;
+}
+
 export default function zennProseRule(context, userOptions = {}) {
   const { Syntax, RuleError, report, getSource } = context;
   const options = { ...DEFAULT_OPTIONS, ...userOptions };
   let blockquoteDepth = 0;
+  const headings = [];
 
   function checkProhibitedExpressions(node, maskedText) {
+    const raw = getSource(node);
+    const quotedLinkTitleRanges = [];
+    walkChildren(node, (child) => {
+      const start = child.range[0] - node.range[0];
+      // 裸の URL も Link になり、後ろの全角文字まで範囲に含むので、[...](...) の形だけにする
+      if (child.type === 'Link' && raw[start] === '[') {
+        quotedLinkTitleRanges.push([start, child.range[1] - node.range[0]]);
+      }
+    });
+
     for (const match of maskedText.matchAll(FULLWIDTH_COLON_RE)) {
+      const isInQuotedLinkTitle = quotedLinkTitleRanges.some(
+        ([start, end]) => match.index >= start && match.index < end,
+      );
+      if (isInQuotedLinkTitle) continue;
       report(
         node,
         new RuleError('全角コロン「：」ではなく半角コロン「:」を使ってください。', {
@@ -301,13 +356,24 @@ export default function zennProseRule(context, userOptions = {}) {
     [`${Syntax.BlockQuote}:exit`]() {
       blockquoteDepth--;
     },
+    [`${Syntax.Document}:exit`]() {
+      for (const { node, message } of findHeadingStructureErrors(headings)) {
+        report(node, new RuleError(message));
+      }
+    },
     [Syntax.Header](node) {
       if (blockquoteDepth > 0) return;
 
-      if (node.depth >= 4) {
+      headings.push({
+        node,
+        depth: node.depth,
+        text: getSource(node).replace(/^#+\s*/, ''),
+      });
+
+      if (node.depth >= 5) {
         report(
           node,
-          new RuleError(`H${node.depth} 見出しは使わず、H2・H3 の階層に整理してください。`),
+          new RuleError(`H${node.depth} 見出しは使わず、H2〜H4 の階層に整理してください。`),
         );
       }
 
@@ -332,10 +398,21 @@ export default function zennProseRule(context, userOptions = {}) {
       checkProhibitedExpressions(node, masked);
 
       const sentences = splitSentences(masked);
+      const zennBlockBoundaries = getMatchRanges(raw, ZENN_CONTAINER_LINE_RE);
       let prevEnding = null;
       let streak = 0;
 
       for (const sentence of sentences) {
+        const sentenceEnd = sentence.startIndex + sentence.text.length;
+        const boundary = zennBlockBoundaries.find(
+          ([start]) => start >= sentence.startIndex && start < sentenceEnd,
+        );
+        if (boundary) {
+          prevEnding = null;
+          streak = 0;
+          const isDetailsTitle = masked.slice(boundary[1], sentenceEnd).trim() === '';
+          if (isDetailsTitle) continue;
+        }
         const ending = extractSentenceEnding(sentence.text);
         if (ending && ending === prevEnding) {
           streak++;

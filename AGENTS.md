@@ -22,7 +22,7 @@ pnpm test:prose-rules # textlint カスタムルール・設定のテストを�
 - `images/<slug>/`: 記事の画像。本文からは `/images/<slug>/<file>` で参照する
 - `.textlintrc.json`: textlint の設定（`preset-ja-technical-writing` / `prh` / `zenn-prose` / フィルタ）
 - `prh.yml`: `textlint-rule-prh` 用の表記統一辞書（`pnpm lint:prose:fix` で自動修正可能）
-- `textlint-rules/zenn-prose/`: Zenn ブログ固有のカスタムルール（段落文字数・文末連続・H4 禁止・全角コロン・定型クロージング）
+- `textlint-rules/zenn-prose/`: Zenn ブログ固有のカスタムルール（段落文字数・文末連続・H5 以下禁止・見出しの段の飛び・単独の見出し・全角コロン・定型クロージング）
 - `books/`: 未使用
 
 ## 記事の front matter
@@ -55,9 +55,9 @@ publication_name: 'dress_code'
 
 - **ツール表記**: `oxlint` は小文字で統一する（コード・引用・他記事タイトルを除く）
 - **かな・漢字**: `か月` / `か所` / `次のとおり`・`以下のとおり` / `嬉しい` にそろえる。補助動詞・形式名詞はひらがな（`してください`・`できる`・`すること`・`するため`）
-- **記号**: 三点リーダーは `…`（`...` はコード・引用外で使わない）。ラベルのコロンは半角 `:` にそろえ、全角 `：` を混ぜない
+- **記号**: 三点リーダーは `…`（`...` はコード・引用外で使わない）。ラベルのコロンは半角 `:` にそろえ、全角 `：` を混ぜない（リンクテキストに引用した他記事タイトルは除く）
 - **和欧間スペース**: 新規記事と混在記事は和文と英数字の間に半角スペースを入れる
-- **段落・見出し**: 1 段落は 3〜5 行（上限 250 字）を目安にする。見出しは H2・H3 を主軸にし、H4 以下は使わない。結びの見出しは「おわりに」または「まとめ」を使う
+- **段落・見出し**: 1 段落は 3〜5 行（上限 250 字）を目安にする。見出しは H2・H3 を主軸にし、H4 は目次に載らない補足見出しとして必要なときだけ使う。H5 以下は使わない。見出しは 1 段ずつ深くし（H2 の直下に H4 を置かない）、同じ親の下に同じ段の見出しを 2 つ以上並べる（1 つだけなら見出しを外して本文に続ける）。結びの見出しは「おわりに」または「まとめ」を使う
 - **定型句**: 「参考になれば幸いです / 嬉しいです」のような定型クロージングは避け、具体的な次の一歩や読者への問いかけを書く
 - **太字**: Zenn（CommonMark）で日本語句読点や括弧に隣接する `**...**` が崩れる箇所の前後スペースは維持する
 
@@ -66,11 +66,11 @@ publication_name: 'dress_code'
 ### 公開前チェック
 
 1. `pnpm fmt:check` で整形差分がないことを確認する
-2. `pnpm exec textlint articles/<slug>.md` で表記揺れ・日本語校正・長段落・文末連続・H4 見出しがないことを確認する（表記揺れは `pnpm lint:prose:fix` で自動修正できる）
+2. `pnpm exec textlint articles/<slug>.md` で表記揺れ・日本語校正・長段落・文末連続・見出しの構成（H5 以下・段の飛び・単独の見出し）に違反がないことを確認する（表記揺れは `pnpm lint:prose:fix` で自動修正できる）
 3. `yomiyasu` で推敲し、意味が変わっていないことと WARN 残件を確認する
 4. `pnpm preview` でブラウザ表示（太字・Mermaid 図・表・見出しアンカー・画像）を確認する
 
 ## 整形
 
 - 設定は `oxfmt.config.ts`。front matter とコードブロックも整形する
-- コミット時に lefthook がステージ済みファイルを `oxfmt` で整形し、新規追加した `articles/*.md` に `textlint` を実行する（既存記事は `pnpm lint:prose` で確認する）。CI は `pnpm fmt:check` と `pnpm test:prose-rules` を実行し、PR で追加した `articles/*.md` に `textlint` を実行する
+- コミット時に lefthook がステージ済みファイルを `oxfmt` で整形し、ステージ済みの `articles/*.md` に `textlint` を実行する。CI は `pnpm fmt:check`・`pnpm test:prose-rules`・`pnpm lint:prose` を実行する

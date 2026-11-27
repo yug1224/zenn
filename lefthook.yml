@@ -1,6 +1,11 @@
 pre-commit:
   jobs:
     - name: oxfmt
-      glob: '*.{md,ts,json,yml}'
+      glob: '*.{md,ts,mjs,json,yml}'
       run: pnpm exec oxfmt {staged_files}
+      stage_fixed: true
+    - name: textlint
+      glob: 'articles/*.md'
+      # --fix は直せない違反しか残らないと exit 0 になるので、直したあとに全記事を検査する
+      run: pnpm exec textlint --fix {staged_files} && pnpm lint:prose
       stage_fixed: true

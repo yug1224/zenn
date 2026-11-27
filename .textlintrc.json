@@ -1,0 +1,46 @@
+{
+  "filters": {
+    "comments": true,
+    "allowlist": {
+      "allow": ["/^:{3,}(?:message(?:[ \\t]+alert)?|details)?[ \\t]*$/m"]
+    }
+  },
+  "rules": {
+    "preset-ja-technical-writing": {
+      "sentence-length": {
+        "max": 120,
+        "skipPatterns": [
+          "/^:{3,}message(?:[ \\t]+alert)?[ \\t]*\\n?/gm",
+          "/^:{3,}details[^\\n]*\\n/gm",
+          "/^:{3,}[ \\t]*(?:\\n|$)/gm"
+        ]
+      },
+      "no-mix-dearu-desumasu": {
+        "preferInHeader": "",
+        "preferInBody": "ですます",
+        "preferInList": "",
+        "strict": false
+      },
+      "no-exclamation-question-mark": false,
+      "ja-no-weak-phrase": false,
+      "no-doubled-joshi": {
+        "allow": ["も", "か"]
+      },
+      "ja-no-successive-word": {
+        "allowSymbol": true,
+        "allow": ["ある"]
+      },
+      "ja-no-mixed-period": {
+        "allowPeriodMarks": ["ｗ", "…"]
+      },
+      "max-kanji-continuous-len": {
+        "max": 6,
+        "allow": []
+      }
+    },
+    "prh": {
+      "rulePaths": ["./prh.yml"]
+    },
+    "zenn-prose": true
+  }
+}

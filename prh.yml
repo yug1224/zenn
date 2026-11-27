@@ -1,0 +1,118 @@
+version: 1
+rules:
+  - expected: oxlint
+    pattern: /(?<![\w/.-])Oxlint(?![\w])/
+    specs:
+      - from: Oxlint を導入した
+        to: oxlint を導入した
+      - from: OxlintRule と MyOxlint
+        to: OxlintRule と MyOxlint
+      - from: github.com/oxc-project/Oxlint
+        to: github.com/oxc-project/Oxlint
+
+  - expected: か月
+    pattern: /(?:(?<=[0-9０-９一二三四五六七八九十百千万数何幾] ?)カ|[ヶヵ])月/
+    specs:
+      - from: 3ヶ月前に始めた
+        to: 3か月前に始めた
+      - from: 3カ月前に始めた
+        to: 3か月前に始めた
+      - from: 3 カ月前に始めた
+        to: 3 か月前に始めた
+      - from: アメリカ月間
+        to: アメリカ月間
+
+  - expected: か所
+    # 「同一」「変数」のように一・数で終わる熟語は数詞ではないので除く
+    pattern: /(?:(?<=(?:[0-9０-９二三四五六七八九十百千万何幾]|(?<![同単統唯均画])一|(?<![変関引定係])数) ?)[箇カ]|[ヶヵ])所/
+    specs:
+      - from: 2箇所を修正した
+        to: 2か所を修正した
+      - from: 2 箇所を修正した
+        to: 2 か所を修正した
+      - from: 2カ所を確認した
+        to: 2か所を確認した
+      - from: 2 カ所を確認した
+        to: 2 か所を確認した
+      - from: 複数箇所を確認した
+        to: 複数か所を確認した
+      - from: 修正が必要な箇所を確認した
+        to: 修正が必要な箇所を確認した
+      - from: 一箇所と数箇所
+        to: 一か所と数か所
+      - from: 同一箇所と単一箇所と変数箇所
+        to: 同一箇所と単一箇所と変数箇所
+      - from: アメリカ所在の企業
+        to: アメリカ所在の企業
+
+  - expected: 嬉しい
+    pattern: /うれしい/
+    specs:
+      - from: とてもうれしい
+        to: とても嬉しい
+
+  - expected: 以下のとおり
+    pattern: /以下の通り/
+    specs:
+      - from: 以下の通りです
+        to: 以下のとおりです
+
+  - expected: 次のとおり
+    pattern: /次の通り/
+    specs:
+      - from: 次の通りです
+        to: 次のとおりです
+
+  - expected: してください
+    pattern: /して下さい/
+    specs:
+      - from: 確認して下さい
+        to: 確認してください
+
+  - expected: できます
+    pattern: /出来ます/
+    specs:
+      - from: 実行出来ます
+        to: 実行できます
+
+  - expected: できる
+    pattern: /出来る/
+    specs:
+      - from: 利用出来る機能
+        to: 利用できる機能
+
+  - expected: していただく
+    pattern: /して頂く/
+    specs:
+      - from: 対応して頂く
+        to: 対応していただく
+
+  - expected: してみる
+    pattern: /して見る/
+    specs:
+      - from: 試して見る
+        to: 試してみる
+
+  - expected: すること
+    pattern: /する事(?=[がをはにでも、。])/
+    specs:
+      - from: 設定する事ができる
+        to: 設定することができる
+
+  - expected: するため
+    pattern: /する為(?=[にをはのでも、。])/
+    specs:
+      - from: 確認する為に実行する
+        to: 確認するために実行する
+
+  - expected: …
+    pattern: /(?<![.\w(])\.{3}(?![.\w])/
+    specs:
+      - from: いろいろ試して...やっと動いた
+        to: いろいろ試して…やっと動いた
+      - from: props を ...rest で受け取る
+        to: props を ...rest で受け取る
+      - from: 1...10 の範囲
+        to: 1...10 の範囲
+      - from: Promise.all(...) で待つ
+        to: Promise.all(...) で待つ
